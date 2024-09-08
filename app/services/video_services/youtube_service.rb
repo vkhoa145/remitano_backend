@@ -13,6 +13,13 @@ module VideoServices
       return response_data_failed(400, 'Url cannot be blank') if @params[:url].blank?
       return response_data_failed(400, 'Invalid Youtube format') unless valid_url?
 
+      ActionCable.server.broadcast("video_notification_channel", {
+        youtube_id: video_object[:youtube_id],
+        title: video_object[:title],
+        user: current_user.email,
+        url: video_object[:url]
+        }
+      )
       create_video
       result = {
         data: video_object
@@ -40,7 +47,7 @@ module VideoServices
     end
 
     def video_object
-      {
+      @video_object ||= {
         youtube_id: video['items'][0]['id'],
         title: video['items'][0]['snippet']['title'],
         description: video['items'][0]['snippet']['description'],
