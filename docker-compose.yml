@@ -9,7 +9,7 @@ services:
     env_file:
       - .env
     ports:
-      - 3020:3000
+      - 3028:3000
     environment:
       RAILS_ENV: development
       RAILS_SERVE_STATIC_FILES: true
@@ -38,7 +38,7 @@ services:
   db:
     image: mysql:8.0.37
     ports:
-      - "3320:3306"
+      - "3340:3306"
     environment:
       - TZ=Asia/Tokyo
       - MYSQL_ROOT_PASSWORD=HElxFQEC9wa43LyVrgof
@@ -52,7 +52,7 @@ services:
     image: redis:6.0.14
     command: redis-server --requirepass ${REDIS_PASSWORD}
     ports:
-      - "6380:6379"
+      - "6383:6379"
 
 volumes:
   mysql8.0:

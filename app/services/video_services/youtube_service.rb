@@ -13,13 +13,13 @@ module VideoServices
       return response_data_failed(400, 'Url cannot be blank') if @params[:url].blank?
       return response_data_failed(400, 'Invalid Youtube format') unless valid_url?
 
-      ActionCable.server.broadcast("video_notification_channel", {
-        youtube_id: video_object[:youtube_id],
-        title: video_object[:title],
-        user: current_user.email,
-        url: video_object[:url]
-        }
-      )
+      ActionCable.server.broadcast('video_notification_channel', {
+                                     youtube_id: video_object[:youtube_id],
+                                     title: video_object[:title],
+                                     user: current_user.email,
+                                     url: video_object[:url],
+                                     id: SecureRandom.hex(32)
+                                   })
       create_video
       result = {
         data: video_object
@@ -38,7 +38,9 @@ module VideoServices
 
     def video
       video_id = obtain_youtube_id
-      url = URI("https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=#{video_id}&key=#{ENV['YOUTUBE_API_KEY']}")
+      url = URI("https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=#{video_id}&key=#{ENV.fetch(
+        'YOUTUBE_API_KEY', nil
+      )}")
       http = Net::HTTP.new(url.host, url.port)
       http.use_ssl = true
       request = Net::HTTP::Get.new(url)
